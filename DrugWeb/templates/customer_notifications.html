@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Delivery Notifications - DrugWeb{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-bell"></i> Delivery Notifications</h2>
+                <div>
+                    <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications List -->
+    <div class="row">
+        <div class="col-12">
+            {% if notifications %}
+                {% for notification in notifications %}
+                <div class="card mb-3 {% if not notification.is_read %}border-primary{% endif %}">
+                    <div class="card-header d-flex justify-content-between align-items-center
+                        {% if notification.type == 'delivery_accepted' %}bg-success text-white
+                        {% elif notification.type == 'delivery_declined' %}bg-warning text-dark
+                        {% else %}bg-info text-white
+                        {% endif %}">
+                        <div>
+                            <i class="fas 
+                                {% if notification.type == 'delivery_accepted' %}fa-check-circle
+                                {% elif notification.type == 'delivery_declined' %}fa-exclamation-triangle
+                                {% else %}fa-info-circle
+                                {% endif %}"></i>
+                            {% if notification.type == 'delivery_accepted' %}
+                                Delivery Accepted
+                            {% elif notification.type == 'delivery_declined' %}
+                                Delivery Update
+                            {% else %}
+                                Notification
+                            {% endif %}
+                        </div>
+                        <small>
+                            <i class="fas fa-clock"></i> 
+                            {{ notification.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">{{ notification.message }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-bell-slash fa-4x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">No Notifications</h5>
+                        <p class="text-muted">You don't have any delivery notifications yet.</p>
+                        <p class="text-muted">
+                            <small>When you place orders and they get assigned to delivery partners, you'll see updates here.</small>
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-info-circle text-info"></i> About Notifications
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <strong>✅ Delivery Accepted:</strong><br>
+                                Your order has been accepted by a delivery partner and scheduled for delivery.
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <strong>⚠️ Delivery Update:</strong><br>
+                                Your order needs to be reassigned to a different delivery partner.
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="text-muted">
+                                <strong>💡 Stay Updated:</strong><br>
+                                Check back here for real-time updates on your order delivery status.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card.border-primary {
+    border-left: 4px solid #0d6efd !important;
+}
+
+.card-header.bg-success {
+    background-color: #198754 !important;
+}
+
+.card-header.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.card-header.bg-info {
+    background-color: #0dcaf0 !important;
+}
+</style>
+{% endblock %}

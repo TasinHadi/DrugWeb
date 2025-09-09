@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}Delivery Dashboard - DrugWeb{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-truck"></i> Delivery Dashboard</h2>
+                <div>
+                    <span class="badge bg-info fs-6 me-2">Delivery Man</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Assigned Orders</h6>
+                            <h3>{{ assigned_payments|length if assigned_payments else 0 }}</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-clipboard-list fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Available Orders</h6>
+                            <h3>{{ assigned_payments|selectattr('Status', 'equalto', 'Assigned')|list|length if assigned_payments else 0 }}</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-clock fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Total Value</h6>
+                            <h3>৳{{ assigned_payments|sum(attribute='Total_Amount') if assigned_payments else 0 }}</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-money-bill-wave fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title">Accepted Orders</h6>
+                            <h3>{{ assigned_payments|selectattr('Status', 'equalto', 'Accepted for Delivery')|list|length if assigned_payments else 0 }}</h3>
+                        </div>
+                        <div>
+                            <i class="fas fa-check-circle fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assigned Payments List -->
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">
+                <i class="fas fa-truck"></i> Delivery Assignments 
+                <span class="badge bg-light text-dark ms-2">{{ assigned_payments|length if assigned_payments else 0 }} Orders</span>
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if assigned_payments %}
+                <div class="row">
+                    {% for payment in assigned_payments %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-start border-4 {% if payment.Status == 'Assigned' %}border-warning{% elif payment.Status == 'Accepted for Delivery' %}border-success{% else %}border-secondary{% endif %}">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">
+                                        <span class="badge bg-primary">#{{ payment.Payment_ID }}</span>
+                                        {{ payment.Customer_name }}
+                                    </h6>
+                                    <span class="badge 
+                                        {% if payment.Status == 'Assigned' %}bg-warning
+                                        {% elif payment.Status == 'Accepted for Delivery' %}bg-success
+                                        {% else %}bg-secondary
+                                        {% endif %}">
+                                        {{ payment.Status }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-12 mb-2">
+                                        <strong><i class="fas fa-money-bill-wave text-success"></i> Amount: ৳{{ payment.Total_Amount }}</strong>
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <span class="badge {% if payment.payment_type == 'Cash on Delivery' %}bg-warning text-dark{% else %}bg-primary{% endif %}">
+                                            {% if payment.payment_type == 'Cash on Delivery' %}
+                                                🤑 {{ payment.payment_type }}
+                                            {% else %}
+                                                💳 {{ payment.payment_type }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-envelope"></i> {{ payment.Customer_email }}
+                                        </small>
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-phone"></i> {{ payment.Customer_phone if payment.Customer_phone else 'Not provided' }}
+                                        </small>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-map-marker-alt"></i> {{ payment.Customer_address if payment.Customer_address else 'Address not provided' }}
+                                        </small>
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar"></i> Order Date: {{ payment.Payment_date.strftime('%Y-%m-%d %H:%M') if payment.Payment_date else 'N/A' }}
+                                        </small>
+                                    </div>
+                                    {% if payment.delivery_date %}
+                                    <div class="col-12 mb-2">
+                                        <small class="text-success">
+                                            <i class="fas fa-truck"></i> Delivery Date: {{ payment.delivery_date }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% if payment.Status == 'Assigned' or payment.Status == 'Pending Assignment' %}
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-3">
+                                    <button class="btn btn-success me-md-2" onclick="acceptDelivery('{{ payment.Payment_ID }}')">
+                                        <i class="fas fa-check"></i> Accept Delivery
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="declineDelivery('{{ payment.Payment_ID }}')">
+                                        <i class="fas fa-times"></i> Decline
+                                    </button>
+                                </div>
+                                {% else %}
+                                <div class="text-center mt-3">
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle"></i> Already processed
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-truck fa-4x text-muted"></i>
+                    </div>
+                    <h5 class="text-muted">No Delivery Assignments</h5>
+                    <p class="text-muted">You don't have any payments assigned for delivery at the moment.</p>
+                    <small class="text-muted">Check back later or contact admin for new assignments.</small>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Accept Delivery Modal -->
+<div class="modal fade" id="acceptModal" tabindex="-1" aria-labelledby="acceptModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="acceptModalLabel">
+                    <i class="fas fa-calendar-alt"></i> Schedule Delivery
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="acceptForm">
+                    <input type="hidden" id="acceptPaymentId" name="payment_id">
+                    <div class="mb-3">
+                        <label for="deliveryDate" class="form-label">
+                            <i class="fas fa-calendar"></i> Select Delivery Date
+                        </label>
+                        <input type="date" class="form-control" id="deliveryDate" name="delivery_date" required>
+                        <div class="form-text">Please select a date for delivery (minimum tomorrow)</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="confirmAccept()">
+                    <i class="fas fa-check"></i> Accept & Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Decline Delivery Modal -->
+<div class="modal fade" id="declineModal" tabindex="-1" aria-labelledby="declineModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="declineModalLabel">
+                    <i class="fas fa-times-circle"></i> Decline Delivery
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to decline this delivery? This will make the payment available for other deliverymen.</p>
+                <input type="hidden" id="declinePaymentId" name="payment_id">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmDecline()">
+                    <i class="fas fa-times"></i> Decline
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set minimum date to tomorrow
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        document.getElementById('deliveryDate').min = minDate;
+    });
+
+    function acceptDelivery(paymentId) {
+        document.getElementById('acceptPaymentId').value = paymentId;
+        new bootstrap.Modal(document.getElementById('acceptModal')).show();
+    }
+
+    function declineDelivery(paymentId) {
+        document.getElementById('declinePaymentId').value = paymentId;
+        new bootstrap.Modal(document.getElementById('declineModal')).show();
+    }
+
+    function confirmAccept() {
+        const paymentId = document.getElementById('acceptPaymentId').value;
+        const deliveryDate = document.getElementById('deliveryDate').value;
+        
+        if (!deliveryDate) {
+            alert('Please select a delivery date');
+            return;
+        }
+        
+        handleDeliveryAction(paymentId, 'accept', deliveryDate);
+        bootstrap.Modal.getInstance(document.getElementById('acceptModal')).hide();
+    }
+
+    function confirmDecline() {
+        const paymentId = document.getElementById('declinePaymentId').value;
+        handleDeliveryAction(paymentId, 'decline');
+        bootstrap.Modal.getInstance(document.getElementById('declineModal')).hide();
+    }
+
+    function handleDeliveryAction(paymentId, action, deliveryDate = null) {
+        const data = {
+            payment_id: paymentId,
+            action: action
+        };
+        
+        if (deliveryDate) {
+            data.delivery_date = deliveryDate;
+        }
+        
+        fetch('/deliveryman/handle_delivery', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); // Refresh the page to see updated status
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+</script>
+{% endblock %}

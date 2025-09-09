@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - DrugWeb{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h2>
+                <div class="d-flex gap-2">
+                    <span class="badge bg-primary fs-6">{{ medicines|length or 0 }} Medicines</span>
+                    <span class="badge bg-info fs-6">{{ reviews|length or 0 }} Reviews</span>
+                    <span class="badge bg-warning fs-6">{{ requests|length or 0 }} Requests</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="medicines-tab" data-bs-toggle="tab" data-bs-target="#medicines" type="button" role="tab">
+                <i class="fas fa-pills"></i> Medicines
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button" role="tab">
+                <i class="fas fa-star"></i> Reviews
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button" role="tab">
+                <i class="fas fa-clipboard-list"></i> Medicine Requests
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a href="{{ url_for('admin_payments') }}" class="nav-link btn" id="payments-link" style="border: none; background: none; color: #666; text-decoration: none;">
+                <i class="fas fa-credit-card"></i> Manage Payments
+            </a>
+        </li>
+    </ul>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="adminTabsContent">
+        <!-- Medicines Tab -->
+        <div class="tab-pane fade show active" id="medicines" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-pills"></i> Medicine Inventory (Ordered by Code)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 10%;">Code</th>
+                                    <th style="width: 25%;">Name</th>
+                                    <th style="width: 25%;">Generic Name</th>
+                                    <th style="width: 12%; text-align: right;">Price (৳)</th>
+                                    <th style="width: 15%; text-align: center;">Stock</th>
+                                    <th style="width: 13%; text-align: center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicine in medicines %}
+                                <tr>
+                                    <td><strong>{{ medicine.Med_Code }}</strong></td>
+                                    <td>{{ medicine.Name }}</td>
+                                    <td>{{ medicine.Generic_name or 'N/A' }}</td>
+                                    <td style="text-align: right;">৳{{ "%.2f"|format(medicine.Price) }}</td>
+                                    <td style="text-align: center;">
+                                        <span class="badge {% if medicine.Stock > 50 %}bg-success{% elif medicine.Stock > 20 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ medicine.Stock }} units
+                                        </span>
+                                    </td>
+                                    <td style="text-align: center;">
+                                        {% if medicine.Stock > 0 %}
+                                            <span class="badge bg-success">Available</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Out of Stock</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div class="tab-pane fade" id="reviews" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Customer Reviews</h5>
+                </div>
+                <div class="card-body">
+                    {% if reviews %}
+                        <div class="row">
+                            {% for review in reviews %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ review.customer_name }}</h6>
+                                        <p class="card-text">{{ review.review }}</p>
+                                        <small class="text-muted">Customer ID: {{ review.Customer_ID }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i>
+                            No customer reviews found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Requests Tab -->
+        <div class="tab-pane fade" id="requests" role="tabpanel">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Medicine Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if requests %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 25%;">Customer</th>
+                                        <th style="width: 30%;">Medicine Name</th>
+                                        <th style="width: 15%; text-align: center;">Expected Date</th>
+                                        <th style="width: 15%; text-align: center;">Status</th>
+                                        <th style="width: 15%; text-align: center;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req in requests %}
+                                    <tr>
+                                        <td><strong>{{ req.customer_name }}</strong></td>
+                                        <td>{{ req.request_med_name }}</td>
+                                        <td style="text-align: center;">{{ req.Expected_date.strftime('%Y-%m-%d') if req.Expected_date else 'N/A' }}</td>
+                                        <td style="text-align: center;">
+                                            <span class="badge {% if req.Status == 'Pending' or not req.Status %}bg-warning{% elif req.Status == 'Accepted' %}bg-success{% else %}bg-danger{% endif %}">
+                                                {{ req.Status or 'Pending' }}
+                                            </span>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            {% if not req.Status or req.Status == 'Pending' %}
+                                                <button class="btn btn-success btn-sm me-1" onclick="handleRequest('{{ req.Customer_ID }}', '{{ req.request_med_name }}', 'accept')">
+                                                    <i class="fas fa-check"></i> Accept
+                                                </button>
+                                                <button class="btn btn-danger btn-sm" onclick="handleRequest('{{ req.Customer_ID }}', '{{ req.request_med_name }}', 'decline')">
+                                                    <i class="fas fa-times"></i> Decline
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">{{ req.Status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No medicine requests yet.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+function handleRequest(customerId, medicineName, action) {
+    if (confirm(`Are you sure you want to ${action} this request for ${medicineName}?`)) {
+        fetch('/admin/handle_request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                customer_id: customerId,
+                medicine_name: medicineName,
+                action: action
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error processing request');
+        });
+    }
+}
+
+
+</script>
+
+<style>
+.border-left-primary {
+    border-left: 4px solid #007bff;
+}
+
+.nav-tabs .nav-link {
+    color: #666;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: #007bff;
+    color: #007bff;
+}
+
+#payments-link:hover {
+    color: #007bff !important;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #007bff;
+}
+
+/* Table alignment improvements */
+.table.align-middle td,
+.table.align-middle th {
+    vertical-align: middle;
+}
+
+.table thead th {
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.6em;
+    white-space: nowrap;
+}
+
+/* Ensure consistent column widths and alignment */
+.table td:first-child,
+.table th:first-child {
+    font-weight: bold;
+}
+
+/* Medicine table specific alignment */
+.table td:nth-child(4),
+.table th:nth-child(4) {
+    text-align: right !important;
+}
+
+.table td:nth-child(5),
+.table th:nth-child(5),
+.table td:nth-child(6),
+.table th:nth-child(6) {
+    text-align: center !important;
+}
+
+/* Request table specific alignment */
+#requests .table td:nth-child(3),
+#requests .table th:nth-child(3),
+#requests .table td:nth-child(4),
+#requests .table th:nth-child(4),
+#requests .table td:nth-child(5),
+#requests .table th:nth-child(5) {
+    text-align: center !important;
+}
+
+/* Button spacing in tables */
+.btn-sm {
+    margin: 0 2px;
+}
+
+/* Ensure table headers don't wrap */
+.table th {
+    white-space: nowrap;
+}
+</style>
+{% endblock %}

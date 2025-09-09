@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}My Points - DrugWeb{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-star text-warning"></i> My Reward Points</h2>
+                <div>
+                    <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Points Balance Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center py-4">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div>
+                            <i class="fas fa-coins fa-3x mb-3"></i>
+                            <h2 class="display-4 mb-2">{{ current_points }}</h2>
+                            <h5>Current Points Balance</h5>
+                            <p class="mb-0">
+                                <small>Each point = ৳1 value • Earn 1 point for every ৳10 spent</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Points History -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history"></i> Points Transaction History
+                        <span class="badge bg-light text-dark ms-2">{{ points_history|length }} Transactions</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if points_history %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="fas fa-calendar"></i> Date</th>
+                                        <th><i class="fas fa-info-circle"></i> Description</th>
+                                        <th><i class="fas fa-receipt"></i> Payment ID</th>
+                                        <th><i class="fas fa-plus-circle"></i> Points Earned</th>
+                                        <th><i class="fas fa-tag"></i> Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in points_history %}
+                                    <tr>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ transaction.created_at.strftime('%Y-%m-%d') }}<br>
+                                                {{ transaction.created_at.strftime('%I:%M %p') }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            {{ transaction.description }}
+                                        </td>
+                                        <td>
+                                            {% if transaction.payment_id %}
+                                                <span class="badge bg-info">{{ transaction.payment_id }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success fs-6">
+                                                <i class="fas fa-plus"></i> {{ transaction.points_earned }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge 
+                                                {% if transaction.transaction_type == 'earned' %}bg-success
+                                                {% elif transaction.transaction_type == 'redeemed' %}bg-warning
+                                                {% else %}bg-secondary
+                                                {% endif %}">
+                                                {{ transaction.transaction_type|title }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-star fa-4x text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">No Points History</h5>
+                            <p class="text-muted">You haven't earned any points yet.</p>
+                            <p class="text-muted">
+                                <small>Make a purchase to start earning reward points!</small>
+                            </p>
+                            <a href="{{ url_for('customer_dashboard') }}" class="btn btn-primary">
+                                <i class="fas fa-shopping-cart"></i> Start Shopping
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Points Information -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-info-circle text-info"></i> How Reward Points Work
+                    </h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
+                                <h6>Earn Points</h6>
+                                <small class="text-muted">
+                                    Get 1 point for every ৳10 you spend on purchases
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-coins fa-2x text-warning mb-2"></i>
+                                <h6>Point Value</h6>
+                                <small class="text-muted">
+                                    Each point is worth ৳1 when redeemed
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-gift fa-2x text-success mb-2"></i>
+                                <h6>Use Points</h6>
+                                <small class="text-muted">
+                                    Redeem points for discounts on future purchases
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calculator text-info"></i> Points Calculator</h6>
+                            <ul class="list-unstyled small text-muted">
+                                <li>• ৳10 purchase = 1 point earned</li>
+                                <li>• ৳50 purchase = 5 points earned</li>
+                                <li>• ৳100 purchase = 10 points earned</li>
+                                <li>• ৳500 purchase = 50 points earned</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-star text-warning"></i> Your Progress</h6>
+                            <small class="text-muted">
+                                You have <strong>{{ current_points }} points</strong> 
+                                (worth ৳{{ current_points }} in rewards)<br>
+                                {% if current_points < 10 %}
+                                    Spend ৳{{ (10 - current_points) * 10 }} more to reach 10 points!
+                                {% elif current_points < 50 %}
+                                    Great job! Spend ৳{{ (50 - current_points) * 10 }} more to reach 50 points!
+                                {% else %}
+                                    Excellent! You're a valued customer with {{ current_points }} points!
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%) !important;
+}
+
+.badge.fs-6 {
+    font-size: 0.875rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+</style>
+{% endblock %}

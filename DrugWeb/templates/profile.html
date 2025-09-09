@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - DrugWeb{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                <a href="{{ url_for('notifications') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-bell"></i> View All Notifications
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-content">
+        <div class="row">
+            <!-- Profile Information -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-edit"></i> Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="customer_id" class="form-label">Customer ID</label>
+                                        <input type="text" class="form-control" id="customer_id" value="{{ user_info.ID or 'N/A' }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email Address</label>
+                                        <input type="email" class="form-control" id="email" name="email" value="{{ user_info.email or '' }}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="f_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="f_name" name="f_name" value="{{ user_info.F_name or '' }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="l_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="l_name" name="l_name" value="{{ user_info.L_name or '' }}">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="{{ user_info.phone or '' }}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="3">{{ user_info.address or '' }}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Profile
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar with Points and Quick Stats -->
+            <div class="col-lg-4">
+                <!-- Reward Points -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white text-center">
+                        <h5 class="mb-0"><i class="fas fa-coins"></i> Reward Points</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="display-4 text-success mb-2">
+                            {{ customer_info.points or 0 }}
+                        </div>
+                        <p class="text-muted mb-3">Current Balance</p>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <small class="text-muted">Points to Next Reward</small>
+                                    <div class="fw-bold">{{ (100 - (customer_info.points or 0) % 100) if (customer_info.points or 0) % 100 != 0 else 100 }}</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-2">
+                                    <small class="text-muted">Membership Level</small>
+                                    <div class="fw-bold">
+                                        {% set points = customer_info.points or 0 %}
+                                        {% if points < 100 %}Bronze
+                                        {% elif points < 500 %}Silver
+                                        {% elif points < 1000 %}Gold
+                                        {% else %}Platinum
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress mt-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: {{ ((customer_info.points or 0) % 100) }}%"></div>
+                        </div>
+                        <small class="text-muted">Progress to next level</small>
+                    </div>
+                </div>
+
+                <!-- Quick Notifications -->
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-bell"></i> Recent Activity</h6>
+                    </div>
+                    <div class="card-body p-2">
+                        {% if recent_requests %}
+                            <div class="mb-3">
+                                <small class="text-muted fw-bold">Recent Requests:</small>
+                                {% for request in recent_requests[:2] %}
+                                <div class="d-flex align-items-center mt-1">
+                                    <i class="fas fa-clipboard-list text-warning me-2"></i>
+                                    <small>{{ request.request_med_name }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        {% if recent_reviews %}
+                            <div class="mb-3">
+                                <small class="text-muted fw-bold">Recent Reviews:</small>
+                                {% for review in recent_reviews[:1] %}
+                                <div class="d-flex align-items-start mt-1">
+                                    <i class="fas fa-star text-warning me-2"></i>
+                                    <small>{{ review.review[:30] }}{{ '...' if review.review|length > 30 else '' }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="text-center">
+                            <a href="{{ url_for('notifications') }}" class="btn btn-outline-info btn-sm">
+                                View All Notifications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Statistics -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0"><i class="fas fa-chart-bar"></i> Account Statistics</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <i class="fas fa-clipboard-list fa-2x text-primary mb-2"></i>
+                                    <h4>{{ recent_requests|length if recent_requests else 0 }}</h4>
+                                    <small class="text-muted">Total Requests</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <i class="fas fa-star fa-2x text-warning mb-2"></i>
+                                    <h4>{{ recent_reviews|length if recent_reviews else 0 }}</h4>
+                                    <small class="text-muted">Reviews Given</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <i class="fas fa-shopping-cart fa-2x text-success mb-2"></i>
+                                    <h4>0</h4>
+                                    <small class="text-muted">Orders Placed</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="border rounded p-3">
+                                    <i class="fas fa-coins fa-2x text-info mb-2"></i>
+                                    <h4>{{ customer_info.points or 0 }}</h4>
+                                    <small class="text-muted">Points Earned</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Points Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h6 class="mb-0"><i class="fas fa-info-circle"></i> How to Earn Points</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 text-center">
+                                <i class="fas fa-shopping-bag fa-3x text-primary mb-2"></i>
+                                <h6>Shop & Earn</h6>
+                                <p class="small text-muted">Earn 1 point for every ৳10 spent</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <i class="fas fa-star fa-3x text-warning mb-2"></i>
+                                <h6>Write Reviews</h6>
+                                <p class="small text-muted">Get 5 points for each review</p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <i class="fas fa-gift fa-3x text-success mb-2"></i>
+                                <h6>Redeem Rewards</h6>
+                                <p class="small text-muted">Use 100 points = ৳10 discount</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ url_for('customer_dashboard') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,735 @@
+/* Custom CSS for DrugWeb */
+
+/* Global Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-content {
+    text-align: left;
+}
+
+.hero-icon {
+    font-size: 15rem;
+    color: rgba(255, 255, 255, 0.3);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.hero-buttons .btn {
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Medicine Cards */
+.medicine-card {
+    transition: all 0.3s ease;
+}
+
+.medicine-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.medicine-card .card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.medicine-card .card-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5em 0.75em;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #28a745, #1e7e34);
+    border: none;
+}
+
+.btn-info {
+    background: linear-gradient(45deg, #17a2b8, #117a8b);
+    border: none;
+}
+
+/* Tables */
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Forms */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 10px;
+    border: none;
+    padding: 15px 20px;
+}
+
+.alert-success {
+    background: linear-gradient(45deg, #d4edda, #c3e6cb);
+    color: #155724;
+}
+
+.alert-danger {
+    background: linear-gradient(45deg, #f8d7da, #f1b0b7);
+    color: #721c24;
+}
+
+.alert-info {
+    background: linear-gradient(45deg, #d1ecf1, #bee5eb);
+    color: #0c5460;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Statistics Cards */
+.card.bg-primary, .card.bg-success, .card.bg-info, .card.bg-warning, .card.bg-danger {
+    background: linear-gradient(45deg, var(--bs-primary), var(--bs-primary)) !important;
+}
+
+.card.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+.card.bg-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14) !important;
+}
+
+.card.bg-danger {
+    background: linear-gradient(45deg, #dc3545, #e83e8c) !important;
+}
+
+.card.bg-info {
+    background: linear-gradient(45deg, #17a2b8, #6f42c1) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-icon {
+        font-size: 8rem;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-buttons .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Search Section */
+.search-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Medicine Grid Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.medicine-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Price Display */
+.text-primary {
+    font-weight: 700;
+}
+
+/* Stock Badge Colors */
+.badge.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+.badge.bg-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14) !important;
+    color: #212529 !important;
+}
+
+.badge.bg-danger {
+    background: linear-gradient(45deg, #dc3545, #e83e8c) !important;
+}
+
+/* Tab Styles */
+.nav-tabs .nav-link {
+    border-radius: 8px 8px 0 0;
+    margin-right: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-color: #007bff;
+}
+
+.nav-tabs .nav-link.active {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    color: white !important;
+    border-color: #007bff;
+}
+
+/* Review and Request Items */
+.review-item {
+    transition: all 0.3s ease;
+}
+
+.review-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.request-item {
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #f8f9fa, #ffffff);
+}
+
+.request-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Form Enhancements */
+.form-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+}
+
+/* Custom Scrollbar for Review/Request Containers */
+.card-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.card-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border-radius: 10px;
+}
+
+.card-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+}
+
+/* Information Section */
+.card.border-info {
+    border-width: 2px !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+/* Checkbox Styling */
+.form-check-input:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.form-check-input:focus {
+    border-color: #007bff;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+}
+
+/* Medicine Grid Animations */
+.medicine-card {
+    opacity: 0;
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.medicine-card:nth-child(1) { animation-delay: 0.1s; }
+.medicine-card:nth-child(2) { animation-delay: 0.2s; }
+.medicine-card:nth-child(3) { animation-delay: 0.3s; }
+.medicine-card:nth-child(4) { animation-delay: 0.4s; }
+.medicine-card:nth-child(5) { animation-delay: 0.5s; }
+.medicine-card:nth-child(6) { animation-delay: 0.6s; }
+.medicine-card:nth-child(7) { animation-delay: 0.7s; }
+.medicine-card:nth-child(8) { animation-delay: 0.8s; }
+.medicine-card:nth-child(9) { animation-delay: 0.9s; }
+
+/* Enhanced Button Styles */
+.btn-warning {
+    background: linear-gradient(45deg, #ffc107, #e0a800);
+    border: none;
+    color: #212529 !important;
+    font-weight: 600;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(45deg, #e0a800, #d39e00);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+}
+
+/* Status Badge Enhancements */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.badge.bg-info {
+    background: linear-gradient(45deg, #17a2b8, #138496) !important;
+}
+
+.badge.bg-secondary {
+    background: linear-gradient(45deg, #6c757d, #545b62) !important;
+}
+
+/* Mobile Responsiveness for Tabs */
+@media (max-width: 768px) {
+    .nav-tabs .nav-link {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .tab-content {
+        margin-top: 1rem;
+    }
+    
+    .review-item, .request-item {
+        margin-bottom: 1rem !important;
+        padding: 1rem !important;
+    }
+}
+
+/* Profile Styles */
+.display-4 {
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress {
+    background-color: rgba(40, 167, 69, 0.2);
+}
+
+.progress-bar {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+    transition: width 0.6s ease;
+}
+
+/* Notification Styles */
+.alert {
+    border-radius: 12px;
+    border: none;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.alert-heading {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+/* Statistics Cards */
+.border.rounded {
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #ffffff, #f8f9fa);
+}
+
+.border.rounded:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+}
+
+/* Points System Colors */
+.text-success {
+    color: #28a745 !important;
+}
+
+.bg-success {
+    background: linear-gradient(45deg, #28a745, #20c997) !important;
+}
+
+/* Profile Avatar Placeholder */
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, #007bff, #6f42c1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin: 0 auto 1rem;
+}
+
+/* Notification Badge Animation */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.badge {
+    animation: pulse 2s infinite;
+}
+
+/* Customer ID Styling */
+#customer_id {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    font-weight: bold;
+    color: #495057;
+}
+
+/* Form Enhancement for Profile */
+.form-control:read-only {
+    background-color: #f8f9fa;
+    opacity: 1;
+}
+
+/* Membership Level Colors */
+.membership-bronze { color: #cd7f32; }
+.membership-silver { color: #c0c0c0; }
+.membership-gold { color: #ffd700; }
+.membership-platinum { color: #e5e4e2; }
+
+/* Quick Actions Buttons */
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-info:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design for Profile */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .alert {
+        padding: 1rem;
+    }
+    
+    .border.rounded {
+        padding: 1rem !important;
+        margin-bottom: 1rem;
+    }
+}
+
+/* Cart Styles */
+.cart-item {
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.qty-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.qty-input {
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Cart Badge */
+#cart-count {
+    position: relative;
+    top: -2px;
+    left: -5px;
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+}
+
+/* Payment Method Cards */
+.payment-method-card {
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #ffffff, #f8f9fa);
+}
+
+.payment-method-card:hover {
+    border-color: #007bff;
+    background: linear-gradient(45deg, rgba(0, 123, 255, 0.05), rgba(0, 123, 255, 0.1));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.payment-method-card.border-primary {
+    border-color: #007bff !important;
+    background: linear-gradient(45deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.2)) !important;
+}
+
+/* Checkout Summary */
+.position-sticky {
+    top: 100px !important;
+}
+
+/* Order Success Animation */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.modal .fa-check-circle {
+    animation: bounce 2s infinite;
+}
+
+/* Cart Table Improvements */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Empty Cart Styling */
+.empty-cart-icon {
+    color: #6c757d;
+    opacity: 0.5;
+}
+
+/* Quantity Input Validation */
+.qty-input:invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* Delivery Info Cards */
+.card .fa-clock,
+.card .fa-shield-alt,
+.card .fa-money-bill-wave {
+    font-size: 1.1rem;
+}
+
+/* Total Amount Highlight */
+.table-success {
+    background-color: rgba(40, 167, 69, 0.1) !important;
+}
+
+.table-success strong {
+    color: #28a745;
+}
+
+/* Mobile Cart Responsiveness */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .qty-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .qty-input {
+        width: 60px !important;
+    }
+    
+    .payment-method-card {
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .position-sticky {
+        position: static !important;
+    }
+}
+
+/* Loading Spinner for Add to Cart */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+/* Success Notification Positioning */
+.position-fixed {
+    z-index: 1055;
+}
+
+/* Cart Item Remove Animation */
+@keyframes slideOut {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.removing {
+    animation: slideOut 0.3s ease-out forwards;
+}

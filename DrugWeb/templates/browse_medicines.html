@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Medicines - DrugWeb</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .medicine-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+        }
+        .medicine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .medicine-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            border-radius: 8px 8px 0 0;
+        }
+        .price-tag {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .stock-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+        }
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .cart-btn {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            transition: all 0.3s;
+        }
+        .cart-btn:hover {
+            background: linear-gradient(45deg, #0056b3, #004085);
+            transform: scale(1.05);
+        }
+        .pagination .page-link {
+            color: #007bff;
+            border: none;
+            margin: 0 2px;
+            border-radius: 5px;
+        }
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border-color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('customer.dashboard') }}">
+                <i class="fas fa-pills"></i> DrugWeb
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('customer.dashboard') }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a class="nav-link" href="{{ url_for('customer.view_cart') }}" id="cart-link">
+                    <i class="fas fa-shopping-cart"></i> Cart 
+                    <span class="badge bg-warning text-dark" id="cart-count">0</span>
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">
+                    <i class="fas fa-search"></i> Browse Medicines
+                    <small class="text-muted fs-6">{{ total_count }} medicines found</small>
+                </h2>
+                
+                <!-- Filters Section -->
+                <div class="filter-section">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label"><i class="fas fa-search"></i> Search</label>
+                            <input type="text" class="form-control" name="search" 
+                                   value="{{ search }}" placeholder="Medicine name, generic name, or category">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><i class="fas fa-tags"></i> Category</label>
+                            <select class="form-select" name="category">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.Category }}" 
+                                    {% if category == cat.Category %}selected{% endif %}>
+                                    {{ cat.Category }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label"><i class="fas fa-sort"></i> Sort By</label>
+                            <select class="form-select" name="sort_by">
+                                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name A-Z</option>
+                                <option value="price" {% if sort_by == 'price' %}selected{% endif %}>Price Low-High</option>
+                                <option value="price_desc" {% if sort_by == 'price_desc' %}selected{% endif %}>Price High-Low</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Results Section -->
+                {% if medicines %}
+                <div class="row">
+                    {% for medicine in medicines %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="card medicine-card h-100">
+                            <div class="position-relative">
+                                <div class="medicine-image">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                                <span class="badge {% if medicine.Stock > 0 %}bg-success{% else %}bg-danger{% endif %} stock-badge">
+                                    {% if medicine.Stock > 0 %}In Stock{% else %}Out of Stock{% endif %}
+                                </span>
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <h6 class="card-title text-primary mb-1">{{ medicine.Name }}</h6>
+                                <p class="text-muted small mb-2">{{ medicine.Generic_name }}</p>
+                                {% if medicine.Category %}
+                                <span class="badge bg-secondary mb-2">{{ medicine.Category }}</span>
+                                {% endif %}
+                                <p class="card-text small flex-grow-1">{{ medicine.Description or 'No description available' }}</p>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="price-tag">₹{{ "%.2f"|format(medicine.Price) }}</span>
+                                        <small class="text-muted">per unit</small>
+                                    </div>
+                                    {% if medicine.Stock > 0 %}
+                                    <div class="d-flex gap-2">
+                                        <input type="number" class="form-control form-control-sm quantity-input" 
+                                               value="1" min="1" 
+                                               style="width: 80px;" id="qty-{{ medicine.Med_Code }}">
+                                        <button class="btn btn-primary cart-btn flex-grow-1" 
+                                                onclick="addToCart('{{ medicine.Med_Code }}', '{{ medicine.Name }}')"
+                                                id="btn-{{ medicine.Med_Code }}">
+                                            <i class="fas fa-cart-plus"></i> Add to Cart
+                                        </button>
+                                    </div>
+                                    {% else %}
+                                    <button class="btn btn-secondary w-100" disabled>
+                                        <i class="fas fa-times"></i> Out of Stock
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if total_pages > 1 %}
+                <nav aria-label="Medicine pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page-1 }}&search={{ search }}&category={{ category }}&sort_by={{ sort_by }}">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in range(1, total_pages + 1) %}
+                            {% if page_num == page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% elif page_num <= 3 or page_num > total_pages - 3 or (page_num >= page - 1 and page_num <= page + 1) %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_num }}&search={{ search }}&category={{ category }}&sort_by={{ sort_by }}">{{ page_num }}</a>
+                            </li>
+                            {% elif page_num == 4 or page_num == total_pages - 3 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page+1 }}&search={{ search }}&category={{ category }}&sort_by={{ sort_by }}">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No medicines found</h4>
+                    <p class="text-muted">Try adjusting your search criteria or browse all medicines.</p>
+                    <a href="{{ url_for('customer.browse_medicines') }}" class="btn btn-primary">
+                        <i class="fas fa-pills"></i> View All Medicines
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle"></i> Success
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="successMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Shopping</button>
+                    <a href="{{ url_for('customer.view_cart') }}" class="btn btn-primary">
+                        <i class="fas fa-shopping-cart"></i> View Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle"></i> Error
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Load cart count on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartCount();
+        });
+
+        function updateCartCount() {
+            fetch('/cart/count')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('cart-count').textContent = data.count || 0;
+                    }
+                })
+                .catch(error => console.log('Error updating cart count:', error));
+        }
+
+        function addToCart(medCode, medName) {
+            const quantityInput = document.getElementById(`qty-${medCode}`);
+            const quantity = parseInt(quantityInput.value) || 1;
+            const button = document.getElementById(`btn-${medCode}`);
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+            
+            fetch('/customer/add_to_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    med_code: medCode,
+                    quantity: quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Re-enable button
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                
+                if (data.success) {
+                    // Show success modal
+                    document.getElementById('successMessage').textContent = data.message;
+                    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                    successModal.show();
+                    
+                    // Update cart count
+                    if (data.cart_count !== undefined) {
+                        document.getElementById('cart-count').textContent = data.cart_count;
+                    }
+                    
+                    // Reset quantity to 1
+                    quantityInput.value = 1;
+                } else {
+                    // Show error modal
+                    document.getElementById('errorMessage').textContent = data.message || 'Failed to add item to cart';
+                    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                    errorModal.show();
+                }
+            })
+            .catch(error => {
+                // Re-enable button
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                
+                console.error('Error:', error);
+                document.getElementById('errorMessage').textContent = 'Network error occurred. Please try again.';
+                const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+                errorModal.show();
+            });
+        }
+
+        // Quantity input validation
+        document.querySelectorAll('.quantity-input').forEach(input => {
+            input.addEventListener('change', function() {
+                const min = parseInt(this.min);
+                const max = parseInt(this.max);
+                const value = parseInt(this.value);
+                
+                if (value < min) this.value = min;
+                if (value > max) this.value = max;
+            });
+        });
+    </script>
+</body>
+</html>

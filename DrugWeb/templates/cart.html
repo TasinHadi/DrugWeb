@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - DrugWeb{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-shopping-cart"></i> Shopping Cart</h2>
+                <a href="{{ url_for('customer.dashboard') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Continue Shopping
+                </a>
+            </div>
+
+            {% if cart_items %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Medicine</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in cart_items %}
+                                    <tr id="cart-item-{{ item.Cart_ID }}">
+                                        <td>
+                                            <strong>{{ item.Med_Name }}</strong>
+                                            <br><small class="text-muted">Code: {{ item.Med_Code }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-primary">৳{{ "%.2f"|format(item.unit_price) }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm" style="width: 120px;">
+                                                <button class="btn btn-outline-secondary" type="button" 
+                                                        onclick="updateQuantity({{ item.Cart_ID }}, {{ item.quantity - 1 }})">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <input type="number" class="form-control text-center" 
+                                                       id="quantity-{{ item.Cart_ID }}" 
+                                                       value="{{ item.quantity }}" 
+                                                       min="1" readonly>
+                                                <button class="btn btn-outline-secondary" type="button" 
+                                                        onclick="updateQuantity({{ item.Cart_ID }}, {{ item.quantity + 1 }})">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success" id="total-{{ item.Cart_ID }}">
+                                                ৳{{ "%.2f"|format(item.total_price) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    onclick="removeFromCart({{ item.Cart_ID }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Cart Summary -->
+                        <div class="row mt-4">
+                            <div class="col-md-6 offset-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Cart Summary</h5>
+                                        <hr>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Total Items:</span>
+                                            <span id="total-items">{{ cart_items|length }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <strong>Total Amount:</strong>
+                                            <strong class="text-success" id="total-amount">
+                                                ৳{{ "%.2f"|format(total_cart_value) }}
+                                            </strong>
+                                        </div>
+                                        <hr>
+                                        <div class="d-grid gap-2">
+                                            <a href="{{ url_for('customer.proceed_checkout') }}" class="btn btn-success btn-lg">
+                                                <i class="fas fa-check"></i> Proceed to Checkout
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted">Your cart is empty</h4>
+                            <p class="text-muted">Add some medicines to your cart to get started</p>
+                            <a href="{{ url_for('customer.dashboard') }}" class="btn btn-primary">
+                                <i class="fas fa-pills"></i> Browse Medicines
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function updateQuantity(cartId, newQuantity) {
+    if (newQuantity < 1) return;
+    
+    console.log('Updating quantity for cart ID:', cartId, 'to quantity:', newQuantity);
+    
+    fetch('/customer/update_cart_quantity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            cart_id: cartId,
+            quantity: newQuantity
+        })
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            // Update quantity display
+            document.getElementById('quantity-' + cartId).value = data.new_quantity;
+            // Update item total - ensure it's a number
+            const itemTotal = parseFloat(data.item_total) || 0;
+            document.getElementById('total-' + cartId).innerHTML = '৳' + itemTotal.toFixed(2);
+            console.log('Quantity updated successfully');
+        } else {
+            console.error('Server returned error:', data.message);
+            alert('Error updating quantity: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        // Only show alert if it's a real error, not just a page navigation
+        if (!error.message.includes('Failed to fetch')) {
+            alert('Error updating quantity: ' + error.message);
+        }
+    });
+}
+
+function removeFromCart(cartId) {
+    if (confirm('Are you sure you want to remove this item from your cart?')) {
+        fetch('/customer/remove_from_cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                cart_id: cartId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the row from the table
+                document.getElementById('cart-item-' + cartId).remove();
+                // Update cart summary safely
+                updateCartSummaryProperly();
+            } else {
+                alert('Error removing item: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error removing item');
+        });
+    }
+}
+
+function updateCartSummary() {
+    // Calculate total items and total amount from current page data
+    let totalItems = 0;
+    let totalAmount = 0;
+    
+    // Get all quantity inputs and total spans
+    const quantityInputs = document.querySelectorAll('[id^="quantity-"]');
+    const totalSpans = document.querySelectorAll('[id^="total-"]');
+    
+    quantityInputs.forEach(input => {
+        const quantity = parseInt(input.value) || 0;
+        totalItems += quantity;
+    });
+    
+    totalSpans.forEach(span => {
+        const totalText = span.textContent.replace('৳', '').trim();
+        const total = parseFloat(totalText) || 0;
+        totalAmount += total;
+    });
+    
+    // Update the cart summary display more safely
+    // Find the exact elements in the cart summary section
+    const cartSummarySection = document.querySelector('.container .row .col-lg-4, .container .row .col-md-4, .cart-summary');
+    if (cartSummarySection) {
+        // Update Total Items
+        const totalItemsElements = cartSummarySection.querySelectorAll('*');
+        totalItemsElements.forEach(element => {
+            if (element.textContent && element.textContent.includes('Total Items:') && !element.querySelector('*')) {
+                // This is a text node that contains "Total Items:" - update just the number
+                const textContent = element.textContent;
+                const newContent = textContent.replace(/Total Items:\s*\d+/, `Total Items: ${totalItems}`);
+                if (newContent !== textContent) {
+                    element.textContent = newContent;
+                }
+            }
+        });
+        
+        // Update Total Amount  
+        const totalAmountElements = cartSummarySection.querySelectorAll('*');
+        totalAmountElements.forEach(element => {
+            if (element.textContent && element.textContent.includes('Total Amount:') && !element.querySelector('*')) {
+                // This is a text node that contains "Total Amount:" - update just the amount
+                const textContent = element.textContent;
+                const newContent = textContent.replace(/Total Amount:\s*৳[\d.]+/, `Total Amount: ৳${totalAmount.toFixed(2)}`);
+                if (newContent !== textContent) {
+                    element.textContent = newContent;
+                }
+            }
+        });
+    }
+}
+
+function updateCartSummaryProperly() {
+    // Calculate total items and total amount from current page data
+    let totalItems = 0;
+    let totalAmount = 0;
+    
+    // Get all quantity inputs and total spans (only from the cart table)
+    const cartTable = document.querySelector('table tbody');
+    if (!cartTable) return;
+    
+    const quantityInputs = cartTable.querySelectorAll('[id^="quantity-"]');
+    const totalSpans = cartTable.querySelectorAll('[id^="total-"]');
+    
+    quantityInputs.forEach(input => {
+        const quantity = parseInt(input.value) || 0;
+        totalItems += quantity;
+    });
+    
+    totalSpans.forEach(span => {
+        const totalText = span.textContent.replace('৳', '').trim();
+        const total = parseFloat(totalText) || 0;
+        totalAmount += total;
+    });
+    
+    // Update cart summary - find by specific text and be very precise
+    const allElements = document.querySelectorAll('*');
+    allElements.forEach(element => {
+        const text = element.textContent;
+        
+        // Only update elements that contain EXACTLY "Total Items:" followed by a number
+        if (text && text.match(/^Total Items:\s*\d+$/)) {
+            element.textContent = `Total Items: ${totalItems}`;
+        }
+        
+        // Only update elements that contain EXACTLY "Total Amount:" followed by currency
+        if (text && text.match(/^Total Amount:\s*৳[\d.]+$/)) {
+            element.textContent = `Total Amount: ৳${totalAmount.toFixed(2)}`;
+        }
+    });
+}
+</script>
+{% endblock %}
